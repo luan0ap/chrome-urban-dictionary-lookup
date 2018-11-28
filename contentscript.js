@@ -25,10 +25,10 @@ const lookupInjected = ()  => {
     }, lookup)
 }
 
-chrome.commands.onCommand.addListener(command => command === 'urban-lookup'? lookupInjected(): false )
+chrome.commands.onCommand.addListener(command => command === 'urban-lookup' && lookupInjected() )
 
-chrome.contextMenus.onClicked.addListener(lookup);
-chrome.browserAction.onClicked.addListener(lookupInjected);
+chrome.contextMenus.onClicked.addListener(lookupInjected)
+chrome.browserAction.onClicked.addListener(lookupInjected)
 
 chrome.runtime.onInstalled.addListener(function () {
     chrome.contextMenus.create({
