@@ -21,7 +21,7 @@ const lookup = (selectionText) =>
 
 const lookupInjected = ()  => {
     chrome.tabs.executeScript(null, {
-        code: `let text = ''; text = window.getSelection().toString() || document.selection.createRange().text || ''`
+        code: `let text = ''; text = window.getSelection().toString() || selection.createRange().text`
     }, lookup)
 }
 
