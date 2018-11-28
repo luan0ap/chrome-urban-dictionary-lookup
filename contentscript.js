@@ -12,32 +12,42 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+
+const newContextMenu = ({ id = '', title = '', contexts = [] }) => {
+    chrome.contextMenus.create({
+        id,
+        title,
+        contexts
+    }, () => {
+        if (chrome.extension.lastError) {
+            throw new Error('Got expected error: ' + chrome.extension.lastError.message);
+        }
+    })
+}
+
 const newChromeTab = (...conf) => chrome.tabs.create.apply(this, conf)
 
-const lookup = (selectionText) => 
-  newChromeTab({
-    'url': 'http://www.urbandictionary.com/define.php?term=' + encodeURI(selectionText)
-  })
+const lookup = (selectionText) =>
+    newChromeTab({
+        'url': 'http://www.urbandictionary.com/define.php?term=' + encodeURI(selectionText)
+    })
 
-const lookupInjected = ()  => {
+const lookupInjected = () => {
     chrome.tabs.executeScript(null, {
         code: `let text = ''; text = window.getSelection().toString() || selection.createRange().text`
     }, lookup)
 }
 
-chrome.commands.onCommand.addListener(command => command === 'urban-lookup' && lookupInjected() )
+chrome.commands.onCommand.addListener(command => command === 'urban-lookup' && lookupInjected())
 
 chrome.contextMenus.onClicked.addListener(lookupInjected)
 chrome.browserAction.onClicked.addListener(lookupInjected)
 
 chrome.runtime.onInstalled.addListener(function () {
-    chrome.contextMenus.create({
-        'id': 'urbanDictionaryContext',
-        'title': 'Lookup the selected text on Urban Directory',
-        'contexts': ['selection']
-    }, function () {
-        if (chrome.extension.lastError) {
-            console.error('Got expected error: ' + chrome.extension.lastError.message);
-        }
-    });
-});
+    const contextMenuConfig = {
+        id: 'urbanDictionaryContext',
+        title: 'Lookup the selected text on Urban Directory',
+        contexts: ['selection']
+    }
+    newContextMenu(contextMenuConfig)
+})
